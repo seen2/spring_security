@@ -2,20 +2,27 @@ package com.spring_security.spring_security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+
+import com.spring_security.spring_security.service.MyUserDetailService;
 
 @EnableWebSecurity
 @Configuration
 public class SpringSecurityConfig {
+
+  private final MyUserDetailService myUserDetailsService;
+
+  public SpringSecurityConfig(MyUserDetailService myUserDetailsService) {
+    this.myUserDetailsService = myUserDetailsService;
+  }
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -43,18 +50,28 @@ public class SpringSecurityConfig {
     return http.build();
   }
 
+  // @Bean
+  // public UserDetailsService myUserDetailsService() {
+
+  // var kavya =
+  // User.withUsername("kavya").password(passwordEncoder().encode("K@123")).roles("USER").build();
+  // var pratik =
+  // User.withUsername("pratik").password(passwordEncoder().encode("P@123")).roles("USER").build();
+
+  // return new InMemoryUserDetailsManager(kavya, pratik);
+  // }
+
   @Bean
-  public UserDetailsService userDetailsService() {
-
-    var kavya = User.withUsername("kavya").password(passwordEncoder().encode("K@123")).roles("USER").build();
-    var pratik = User.withUsername("pratik").password(passwordEncoder().encode("P@123")).roles("USER").build();
-
-    return new InMemoryUserDetailsManager(kavya, pratik);
+  public AuthenticationProvider authenticationProvider() {
+    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+    provider.setPasswordEncoder(passwordEncoder());
+    provider.setUserDetailsService(myUserDetailsService);
+    return provider;
   }
 
   @Bean
   public PasswordEncoder passwordEncoder() {
-    return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    return new BCryptPasswordEncoder(12);
   }
 
 }
