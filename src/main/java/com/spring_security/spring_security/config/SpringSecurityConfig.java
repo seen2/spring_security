@@ -28,7 +28,7 @@ public class SpringSecurityConfig {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     // lambda way
     http.csrf(customizer -> customizer.disable()); // disables csrf
-    http.authorizeHttpRequests(requests -> requests.anyRequest().authenticated()); // any request is authenticated
+    http.authorizeHttpRequests(requests -> requests.requestMatchers("/login","/register").permitAll().anyRequest().authenticated()); // any request is authenticated
     // http.formLogin(Customizer.withDefaults()); //enables form login
     http.httpBasic(Customizer.withDefaults()); // enables postman login
     http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // enables
