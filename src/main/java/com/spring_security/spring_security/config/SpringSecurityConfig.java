@@ -11,7 +11,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.spring_security.spring_security.filter.JwtAuthFilter;
 import com.spring_security.spring_security.service.MyUserDetailService;
 
 @EnableWebSecurity
@@ -19,8 +21,10 @@ import com.spring_security.spring_security.service.MyUserDetailService;
 public class SpringSecurityConfig {
 
   private final MyUserDetailService myUserDetailsService;
+  private final JwtAuthFilter JwtAuthFilter;
 
-  public SpringSecurityConfig(MyUserDetailService myUserDetailsService) {
+  public SpringSecurityConfig(MyUserDetailService myUserDetailsService, JwtAuthFilter JwtAuthFilter) {
+    this.JwtAuthFilter = JwtAuthFilter;
     this.myUserDetailsService = myUserDetailsService;
   }
 
@@ -35,7 +39,7 @@ public class SpringSecurityConfig {
                                                                                                        // different
                                                                                                        // session id for
                                                                                                        // every request
-
+    http.addFilterBefore(JwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
     // imperative way
     /*
      * var customizer = new Customizer<CsrfConfigurer<HttpSecurity>>() {
